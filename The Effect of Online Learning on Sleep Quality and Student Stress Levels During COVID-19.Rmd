@@ -1,0 +1,467 @@
+---
+title: "Lembar Jawaban UAS IS240 Praktek Probabilitas dan Statistika"
+author: "Tuliskan nama anda di sini."
+date: "2021-05"
+output:
+  pdf_document: 
+    toc: yes
+    toc_depth: 4
+    number_sections: yes
+    keep_tex: yes
+  html_document: 
+    number_sections: yes
+  word_document: 
+    toc: yes
+    toc_depth: 4
+    highlight: tango
+    keep_md: yes
+---
+
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+******************************************************   
+Nama     : Meilani Yaputri           
+Kelas    : IS240-BL       
+Kelompok : B1      
+NIM      : 00000045878    
+Tanggal  : 2021-05      
+Waktu    :     
+******************************************************   
+
+# Petunjuk Umum
+
+1.	Gunakan template jurnal Infosys dari laman https://ejournals.umn.ac.id/index.php/SI untuk menuliskan laporan individu. Gunakan template markdown (.Rmd) yang telah disediakan untuk script anda.
+2.	File data disimpan dalam format MS Excel .xlsx. File laporan dalam format MS Word .docx. 
+3.	Format nama file: NamaKelompok_Nama_NIM.extension, contoh: A3_KenDedes_0123456.Rmd.
+4.	Semua output harus dihasilkan oleh program R.
+5.	Semua file yang digunakan untuk menuliskan laporan ini dikumpulkan via elearning dengan zip relative path.
+6.	Setiap mahasiswa mengumpulkan sendiri-sendiri sesuai jadwal UAS.
+7.  **Pastikan file Rmd anda dapat dicompile dengan asumsi file data berada pada folder yang sama dengan script; jangan menggunakan absolute file path.** Bila anda menggunakan R package yang bukan merupakan package default R, tuliskan informasi mengenai package yang perlu diinstal. **File yang tidak dapat dicompile secara otomatis mendapatkan nilai 1 dari 100.**
+
+
+# Soal
+
+## (Bobot 10%) Kelengkapan dan Kesesuaian Format
+
+File markdown script, file laporan dengan format jurnal Infosys dan file data dalam format yang telah ditentukan pada petunjuk ujian disubmit via e-learning.
+
+## (Bobot 10%) Impor Data dan Deskripsi Singkat Data
+
+Impor data anda ke dalam R dengan asumsi file data berada pada folder yang sama dengan file script R anda. Tampilkan deskripsi singkat data anda. 
+
+
+*Jawaban*
+
+```{r message=FALSE, warning=FALSE}
+
+#a-----
+#Import data
+library(readxl) # membaca file excel
+library(qualityTools) # membuat diagram Pareto
+library(dplyr) # untuk filter data
+#Import data
+B1 <- read_excel("B1_MeilaniYaputri_00000045878.xlsx", sheet = "Data Edited")
+View(B1)
+
+#b-------
+#Tuliskan perintah R untuk menampilkan deskripsi singkat data anda.
+str(B1) #strukur data
+head(B1) #menampilkan beberapa data teratas
+tail(B1) #menampilkan beberapa data terbawah
+
+# Mengubah tipe data menjadi tipe data faktor dan mengurutkannya
+B1$kualitas_tidur <- as.factor(B1$kualitas_tidur)
+B1$kualitas_tidur <- factor(B1$kualitas_tidur, levels = c("Sangat Baik", "Baik", "Cukup", "Buruk", "Sangat Buruk"))
+
+B1$tingkat_stres <- as.factor(B1$tingkat_stres)
+B1$tingkat_stres <- factor(B1$tingkat_stres, levels = c("Tidak Stres", "Stres Ringan", "Stres Sedang", "Stres Berat"))
+
+B1$perbandingan_stres <- as.factor(B1$perbandingan_stres)
+B1$perbandingan_stres <- factor(B1$perbandingan_stres, levels = c("Ya","Tidak"))
+
+B1$semester_kuliah <- as.factor(B1$semester_kuliah)
+B1$semester_kuliah <- factor(B1$semester_kuliah, levels = c("1", "2", "3", "4", "5", "6", "7", "8"))
+
+# mengecek apakah tipe data telah berubah menjadi tipe faktor
+str(B1)
+```
+
+
+## (Bobot 30%) Eksplorasi data 
+
+### (20%) Grafik 
+
+Gambarkan grafik yang sesuai untuk menggambarkan distribusi frekuensi semua variabel pada data anda. Bahaslah kategori dengan frekuensi tertinggi dan terendah. Apa yang dapat anda simpulkan? Gambarkan grafik sesuai untuk menggambarkan distribusi frekuensi variabel numerik pada data anda. Apakah distribusinya mengikuti distribusi probabilitas tertentu? Tunjukkan outlier (bila ada) pada gambar dan lakukan uji normalitas. Apa yang dapat anda simpulkan? (Bila semua data anda adalah data kategorikal, tuliskan "Tidak ada variabel numerik.")
+
+
+*Jawaban*
+
+```{r message=FALSE, warning=FALSE}
+#Grafik----
+kualitas<-table(B1$kualitas_tidur)
+barplot(kualitas, main="Distribusi Frekuensi Kualitas Tidur Mahasiswa",col=rainbow(5), ylim = c(0, 100), ylab = " Jumlah Responden", xlab = "Kualitas Tidur")
+paretoChart(kualitas, main="Distribusi Frekuensi Kualitas Tidur Mahasiswa")
+
+# KESIMPULAN
+#Frekuensi tertinggi : “Cukup”
+#Frekuensi terendah : “Sangat Baik”
+#Kesimpulan : subjek penelitian kami didominasi oleh responden dengan kualitas tidur yang cukup, sedangkan jumlah responden dengan kualitas tidur sangat baik paling sedikit. 
+
+tingkat_stres<-table(B1$tingkat_stres)
+barplot(tingkat_stres,main="Distribusi Frekuensi Tingkat Stres Mahasiswa Selama Pembelajaran Daring",col=rainbow(4), ylim = c(0,100), ylab = " Jumlah Responden", xlab = "Tingkat Stres")
+paretoChart(tingkat_stres, main="Distribusi Frekuensi Tingkat Stres Mahasiswa Selama Pembelajaran Daring")
+
+# KESIMPULAN
+#Frekuensi tertinggi : “Stres Ringan”
+#Frekuensi terendah : “Tidak Stres”
+#Kesimpulan : sebagian besar responden mengalami stres ringan saat pembelajaran daring, dan sedikit responden yang tidak mengalami stres saat pembelajaran daring.
+
+perbandingan_stres<-table(B1$perbandingan_stres)
+barplot(perbandingan_stres, main="Distribusi Frekuensi Mahasiswa Cenderung Merasa Lebih Stres Saat Pembelajaran Daring",col=rainbow(2), ylim = c(0, 200), ylab = " Jumlah Responden", xlab = "Stres Pembelajaran Daring Lebih Tinggi daripada Pembelajaran Offline")
+paretoChart(perbandingan_stres, main="Distribusi Frekuensi Mahasiswa Cenderung Merasa Lebih Stres Saat Pembelajaran Daring")
+
+# KESIMPULAN
+#Frekuensi tertinggi : "Ya"
+#Frekuensi terendah : "Tidak"
+#Kesimpulan : subjek penelitian kami didominasi oleh responden yang merasa lebih stres saat pembelajaran daring, sedangkan jumlah responden yang merasa tidak lebih stres saat pembelajaran daring sedikit.
+
+semester_kuliah<-table(B1$semester_kuliah)
+barplot(semester_kuliah, main="Distribusi Frekuensi Semester Kuliah Mahasiswa",col=rainbow(8), ylim = c(0, 200), ylab = " Jumlah Responden", xlab = "Semester")
+paretoChart(semester_kuliah, main="Distribusi Frekuensi Semester Kuliah Mahasiswa")
+
+# KESIMPULAN
+#Frekuensi tertinggi : Semester "2"
+#Frekuensi terendah : Semester "5" "7"
+#Kesimpulan : subjek penelitian kami didominasi oleh responden mahasiswa semester 2, sedangkan jumlah responden mahasiswa semester 5 dan 7 paling sedikit (tidak ada).
+
+## Visualisasi Variabel Numerik
+# Tidak terdapat variabel numerik dan pengujian hipotesa kami tidak memakai variabel numerikal
+# Maka, tidak ada outlier yang dapat ditunjukkan dan pengujian normalitas tidak dapat dilakukan pada variabel kategorikal
+
+```
+
+### (10%) Besaran Statistik
+
+```{r message=FALSE, warning=FALSE}
+#Besaran Statistik----
+# Sumarry data frame B1
+summary(B1)
+
+# Kami tidak dapat menganalisa variabel numerik atau menghitung besaran statistik mean, simpangan baku, koefisien variasi, skewness, maupun kurtosis dari variabel numerik karena kami tidak memiliki variabel numerik.
+
+# Besaran Statistik yang dapat kami tunjukkan dari variabel kategorikal : tabulasi data
+
+# Tabulasi satu variabel
+table(B1$kualitas_tidur)
+table(B1$tingkat_stres)
+table(B1$perbandingan_stres)
+table(B1$semester_kuliah)
+
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+# membuat variabel baru untuk hipotesa 5 dan 6;
+# mahasiswa semester tingkat awal (1-4) sebagai MABA (Mahasiswa Baru) dan mahasiswa semester tingkat akhir (5-8) sebagai MALA (Mahasiswa Lama)
+
+B1$mahasiswa[B1$semester_kuliah == 1] <- "MABA"
+B1$mahasiswa[B1$semester_kuliah == 2] <- "MABA"
+B1$mahasiswa[B1$semester_kuliah == 3] <- "MABA"
+B1$mahasiswa[B1$semester_kuliah == 4] <- "MABA"
+B1$mahasiswa[B1$semester_kuliah == 5] <- "MALA"
+B1$mahasiswa[B1$semester_kuliah == 6] <- "MALA"
+B1$mahasiswa[B1$semester_kuliah == 7] <- "MALA"
+B1$mahasiswa[B1$semester_kuliah == 8] <- "MALA"
+
+table(B1$mahasiswa)
+
+#---------------------------------------------------------------------------------------------------------------------------------------------
+
+# Tabulasi dua variabel ( tabel kontingensi dua arah )
+table(B1$tingkat_stres, B1$kualitas_tidur)
+table(B1$mahasiswa, B1$kualitas_tidur)
+table(B1$mahasiswa, B1$tingkat_stres)
+
+# Karakteristik data
+# data kami terdiri dari 18 variabel. Dari 18 variabel tersebut, data Timestp dan Email Adress tidak digunakan sebagai variabel. Serta, kami hanya menggunakan 4 variabel dari data frame dalam pengujian hipotesa kami yakni kualitas_tidur, tingkat_stres, perbandingan_stres, dan semester_kuliah. Total banyak data observasi dalam variabel kami (length) yakni sebanyak 204 data. Kami juga membuat variabel baru yakni mahasiswa yang terdiri dari "MABA" dan "MALA" untuk membantu pengelompokan jenjang mahasiswa dalam menguji hipotesa 5 dan 6. Total, kami menggunakan 5 variabel dalam pengujian hipotesa kami.
+
+# KESIMPULAN
+# kesimpulan yang dapat diambil adalah kami hanya menggunakan 4 variabel dari data yakni kualitas_tidur, tingkat_stres, perbandingan_stres, dan semester_kuliah yang kemudian semuanya kami ubah menjadi tipe data faktor dan diurutkan levelnya untuk memudahkan pengolahan data dan pengujian hipotesa. Serta, kami membuat variabel baru yang bernama mahasiswa untuk membantu pengujian hipotesa kami nanti. Variabel yang kami gunakan termasuk ke dalam variabel kategorikal sehingga kami tidak bisa melakukan uji normalitas pada tiap variabel dan tidak bisa mencari simpangan baku, koefisien variasi, skewness, dan kurtosis. Kami juga menampilkan tabel frekuensi dari masing-masing variabel dan tabel kontingensi dua arah sebagai langkah awal pengujian 3 dari 6 hipotesa kami yang memuat dua variabel.
+```
+
+
+
+## (Bobot 50%) Uji Hipotesa 
+
+Uji Hipotesa yang kami gunakan : Uji Chi Square Test dan One-sample z-test for a proportion
+
+Chi Square Goodness of Fit Test
+$$\chi^2 = \sum_{i=1}^n \frac {(O_i - E_i)^2}{E_i}$$
+
+Chi Square Independency
+$$\chi^2 = \sum {_i}  \sum {_j} \frac {(O_i - E_i)^2}{E_i}$$
+
+One-sample z-test for a proportion
+$$z = \frac {\hat{p}-p}  {\sqrt{\frac{p.q}{n}}}$$
+
+
+```{r message=FALSE, warning=FALSE}
+
+# Grafik untuk hipotesa 1----------
+  
+hipotesa1<-table(B1$kualitas_tidur)
+hipotesa1
+barplot(hipotesa1, main="Hipotesa 1",col=rainbow(5), ylim = c(0, 100), ylab = " Jumlah Responden", xlab = "Kualitas Tidur")
+
+# KESIMPULAN
+# Dari grafik hipotesa 1, dapat disimpulkan bahwa kualitas tidur mahasiswa lebih dari cukup ("Cukup", "Baik", dan "Sangat Baik") lebih banyak dari kualitas tidur kurang dari cukup ("Buruk" dan "Sangat Buruk")
+
+
+# Uji Hipotesa 1------
+# H0 : Proporsi kualitas tidur mahasiswa kurang dari cukup selama pembelajaran daring dalam situasi COVID-19
+# Ha : Proporsi kualitas tidur mahasiswa lebih dari cukup selama pembelajaran daring dalam situasi COVID-19
+  
+# Tabel frekuensi
+tabel_frek1 <- hipotesa1
+tabel_frek1
+
+# Tabel proporsi
+tabel_prop1 <- tabel_frek1/NROW(B1)
+tabel_prop1
+
+# Uji Hipotesa 
+(chi_test1 <- chisq.test(tabel_frek1))
+
+# Critical Value
+(cvalue1 <- qchisq(0.05, df = 4, lower.tail = FALSE))
+
+# HASIL :
+# p-value (2.2e-16) < alpha (5%) dan t-test/x-squared (85.853) > critical value (9.487729)
+# artinya, H0 ditolak pada tingkat signifikansi 5% dan terima Ha
+
+#Pada data: proporsi kualitas tidur lebih dari cukup = proporsi kualitas tidur "Sangat Baik" + "Baik" + "Cukup", yakni
+Kualitas_Tidur_Lebih_Dari_Cukup <- 0.02941176 + 0.17647059 + 0.38235294
+
+#Pada data: proporsi kualitas tidur kurang dari cukup = proporsi kualitas tidur "Sangat Buruk" + "Buruk", yakni :
+Kualitas_Tidur_Kurang_Dari_Cukup <- 0.30882353 + 0.10294118 
+
+ProporsiH1 <- data.frame(Kualitas_Tidur_Lebih_Dari_Cukup, Kualitas_Tidur_Kurang_Dari_Cukup)
+ProporsiH1
+
+# Kualitas Tidur Lebih Dari Cukup (0.5882353) > Kualitas Tidur Kurang Dari Cukup (0.4117647)
+# KESIMPULAN HIPOTESA 1 : Proporsi kualitas tidur mahasiswa lebih dari cukup selama pembelajaran daring dalam situasi COVID-19
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Grafik untuk hipotesa 2----------
+hipotesa2<-table(B1$tingkat_stres)
+hipotesa2
+barplot(hipotesa2,main="Hipotesa 2",col=rainbow(4), ylim = c(0,100), ylab = " Jumlah Responden", xlab = "Tingkat Stres")
+
+# KESIMPULAN
+# Dari grafik hipotesa 2, dapat disimpulkan bahwa tingkat stres mahasiswa tinggi ("Stres Sedang" dan "Stres Berat") lebih sedikit dari tingkat stres rendah ("Tidak Stres" dan "Stres Ringan")
+
+
+# Uji Hipotesa 2--------
+# H0 : Proporsi mahasiswa yang memiliki tingkat stres tinggi lebih banyak daripada mahasiswa yang memiliki tingkat stres rendah selama pembelajaran daring dalam situasi COVID-19.
+# Ha : Proporsi mahasiswa yang memiliki tingkat stres tinggi lebih sedikit daripada mahasiswa yang memiliki tingkat stres rendah selama pembelajaran daring dalam situasi COVID-19.
+  
+# Tabel frekuensi
+tabel_frek2 <- hipotesa2
+tabel_frek2
+
+# Tabel proporsi
+tabel_prop2 <- tabel_frek2/NROW(B1)
+tabel_prop2
+
+# Uji Hipotesa 
+(chi_test2 <- chisq.test(tabel_frek2))
+
+# Critical Value
+(cvalue2 <- qchisq(0.05, df = 3, lower.tail = FALSE))
+
+# HASIL :
+# p-value (2.2e-16) < alpha (5%) dan t-test/x-squared (79.098) > critical value (7.814728)
+# artinya, H0 ditolak pada tingkat signifikansi 5% dan terima Ha
+
+#Pada data: proporsi tingkat stres rendah = proporsi tingkat stres "Tidak Stres" + "Stres Ringan", yakni
+Stres_Rendah <- 0.09803922 + 0.46078431
+
+#Pada data: proporsi tingkat stres tinggi = proporsi tingkat stres "Stres Sedang" + "Stres Berat", yakni :
+Stres_Tinggi <- 0.33823529 + 0.10294118 
+
+ProporsiH2 <- data.frame(Stres_Rendah, Stres_Tinggi)
+ProporsiH2
+
+# Stres Tinggi (0.4411765) < Stres Rendah (0.5588235)
+# KESIMPULAN HIPOTESA 2 : Proporsi mahasiswa yang memiliki tingkat stres tinggi lebih sedikit daripada mahasiswa yang memiliki tingkat stres rendah selama pembelajaran daring dalam situasi COVID-19.
+#------------------------------------------------------------------------------------------------------------------
+
+# Grafik untuk hipotesa 3----------
+hipotesa3<-table(B1$perbandingan_stres)
+hipotesa3
+barplot(hipotesa3, main="Hipotesa 3",col=rainbow(2), ylim = c(0, 200), ylab = " Jumlah Responden", xlab = "Stres Pembelajaran Daring Lebih Tinggi daripada Pembelajaran Offline")
+
+# KESIMPULAN
+# Dari grafik hipotesa 3, dapat disimpulkan bahwa tingkat stres mahasiswa saat pembelajaran daring lebih tinggi dari tingkat stres saat pembelajaran offline
+
+
+# Uji Hipotesa 3---------
+# H0 : Tingkat stres mahasiswa saat pembelajaran daring lebih rendah dibandingkan saat pembelajaran tatap muka
+# Ha : Tingkat stres mahasiswa saat pembelajaran daring lebih tinggi dibandingkan saat pembelajaran tatap muka
+  
+# Tabel frekuensi
+tabel_frek3 <- hipotesa3
+tabel_frek3
+
+# Tabel proporsi
+tabel_prop3 <- tabel_frek3/NROW(B1)
+tabel_prop3
+  
+# Uji Hipotesa 
+(prop_test3 <- prop.test(131, 204, p = 0.5, alternative = c("greater"), conf.level = 0.95, correct = FALSE))
+
+# 131 merupakan banyak jawaban ya, 204 merupakan jumlah total responden, p = 0.5 mengindikasikan batas null value 50%, alternative greater yakni syarat terpenuhi ha jika lebih besar dari probabilitas 50% responden merasa lebih stres saat pembelajaran daring, conf level 95% saat alpha 5%, dan correct = FALSE berarti tes ini dilakukan tanpa koreksi kontinuitas Yates karena merupakan sampel besar dengan setidaknya 5 peristiwa dan 5 non-peristiwa dalam sampel
+
+# Critical Value
+(cvalue3 <- qchisq(0.05, df = 1, lower.tail = FALSE))
+
+# HASIL :
+# p-value (2,445e-05) < alpha (5%) dan t-test/x-squared (16.49) > critical value (3.841459)
+# artinya, H0 ditolak pada tingkat signifikansi 5% dan terima Ha
+
+# Pada data: proporsi jawaban YA (0.6421569) > jawaban TIDAK (0.3578431)
+# KESIMPULAN HIPOTESA 3 : Tingkat stres mahasiswa saat pembelajaran daring lebih tinggi dibandingkan saat pembelajaran tatap muka
+#------------------------------------------------------------------------------------------------------------------
+
+# Grafik untuk hipotesa 4------
+hipotesa4 <- table(B1$tingkat_stres, B1$kualitas_tidur)
+hipotesa4
+barplot(hipotesa4, main = "Hipotesa 4", horiz = FALSE, xlab = "Kualitas Tidur", ylab = "Jumlah Responden", col = rainbow(4), legend = rownames(B1$tingkat_stres), beside = TRUE, legend.text = c("1 = Tidak Stres", "2 = Stres Ringan", "3 = Stres Sedang", "4 = Stres Berat"))
+
+# KESIMPULAN
+# Dari grafik hipotesa 4, dapat disimpulkan bahwa cenderung ada hubungan pada kualitas tidur dan tingkat stres mahasiswa 
+
+
+# Uji Hipotesa 4-------
+# H0 : Tidak ada hubungan antara kualitas tidur dengan tingkat stres mahasiswa selama pembelajaran daring di situasi COVID-19
+# Ha : Ada hubungan antara kualitas tidur dengan tingkat stres mahasiswa selama pembelajaran daring di situasi COVID-19
+  
+# Tabel frekuensi
+tabel_frek4 <- hipotesa4
+tabel_frek4
+
+# Tabel proporsi
+tabel_prop4 <- tabel_frek4/NROW(B1)
+tabel_prop4
+
+# Uji Hipotesa 
+(chi_test4 <- chisq.test(tabel_frek4))
+
+# Critical Value
+(cvalue4 <- qchisq(0.05, df = 12, lower.tail = FALSE))
+
+# HASIL :
+# p-value (2.506e-06) < alpha (5%) dan t-test/x-squared (48.551) > critical value (21.02607)
+# artinya, H0 ditolak pada tingkat signifikansi 5% dan terima Ha
+
+#Pada data: rasio antara tingkat stres dan kualitas tidur paling mencolok terdapat pada tingkat stres "Stres Ringan" dengan kualitas tidur "Cukup" yang memiliki proporsi lebih besar dari proporsi lainnya; sebesar 0,215686275
+# KESIMPULAN HIPOTESA 4 : Ada hubungan antara kualitas tidur dengan tingkat stres mahasiswa selama pembelajaran daring di situasi COVID-19
+#------------------------------------------------------------------------------------------------------------------
+
+# Grafik untuk hipotesa 5--------
+hipotesa5<- table(B1$mahasiswa, B1$kualitas_tidur)
+hipotesa5
+barplot(hipotesa5, main = "Hipotesa 5", horiz = FALSE, xlab = "Kualitas Tidur", ylab = "Jumlah Responden", col = rainbow(2), legend = rownames(B1$kualitas_tidur), beside = TRUE, legend.text = c("1 = MABA","2 = MALA"))
+
+# KESIMPULAN
+# Dari grafik hipotesa 5, dapat disimpulkan bahwa mahasiswa lama (MALA; semester 5-8) yang memiliki kualitas tidur lebih buruk ("Buruk" dan "Sangat Buruk") lebih sedikit daripada mahasiswa baru (MABA; semester 1-4) yang memiliki kualitas tidur lebih buruk ("Buruk" dan "Sangat Buruk")
+
+
+# Uji Hipotesa 5-------
+# H0 : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki kualitas tidur lebih buruk lebih sedikit dibanding mahasiswa tingkat awal (SEM 1-4) 
+# Ha : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki kualitas tidur lebih buruk lebih banyak dibanding mahasiswa tingkat awal (SEM 1-4)
+  
+# Tabel frekuensi
+tabel_frek5 <- hipotesa5
+tabel_frek5
+
+# Tabel proporsi
+tabel_prop5 <- tabel_frek5/NROW(B1)
+tabel_prop5
+  
+# Uji Hipotesa 
+(chi_test5 <- chisq.test(tabel_frek5))
+
+# Critical Value
+(cvalue5 <- qchisq(0.05, df = 4, lower.tail = FALSE))
+
+# HASIL :
+# p-value (0,5057) > alpha (5%) dan t-test/x-squared (3,3207) < critical value (9,487729)
+# artinya, H0 tidak dapat ditolak pada tingkat signifikansi 5% dan terima H0
+
+Mahasiswa <- c("MABA", "MALA")
+
+#Pada data: proporsi kualitas tidur baik = proporsi kualitas tidur "Sangat Baik" + "Baik", yakni
+Kualitas_Tidur_Baik <- c((0.02941176+0.16176471+0.36274510),(0.00000000+0.01470588+0.01960784))
+
+#Pada data: proporsi kualitas tidur buruk = proporsi kualitas tidur "Sangat Buruk" + "Buruk", yakni :
+Kualitas_Tidur_Buruk <- c((0.29411765+0.08823529),(0.01470588+0.01470588))
+
+ProporsiH5 <- data.frame(Mahasiswa, Kualitas_Tidur_Baik, Kualitas_Tidur_Buruk)
+ProporsiH5
+
+# Kualitas Tidur Buruk MALA 0.02941176 < Kualitas Tidur Buruk MABA 0.38235294
+# KESIMPULAN HIPOTESA 5 : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki kualitas tidur lebih buruk lebih sedikit dibanding mahasiswa tingkat awal (SEM 1-4) 
+#------------------------------------------------------------------------------------------------------------------
+
+# Grafik untuk hipotesa 6--------
+hipotesa6<- table(B1$mahasiswa, B1$tingkat_stres)
+hipotesa6
+barplot(hipotesa6, main = "Hipotesa 6", horiz = FALSE, xlab = "Tingkat Stres", ylab = "Jumlah Responden", col = rainbow(2), legend = rownames(B1$tingkat_stres), beside = TRUE, legend.text = c("1 = MABA","2 = MALA"))
+
+# KESIMPULAN
+# Dari grafik hipotesa 6, dapat disimpulkan bahwa mahasiswa lama (MALA; semester 5-8) yang memiliki tingkat stres tinggi ("Stres Sedang" dan "Stres Berat") lebih sedikit daripada mahasiswa baru (MABA; semester 1-4) yang memiliki tingkat stres tinggi ("Stres Sedang" dan "Stres Berat")
+
+
+# Kekuatan Asosiasi
+# Kekuatan asosiasi antar variabel tidak dapat diukur atau dihitung karena variabel berupa variabel kategorikal
+
+
+# Uji Hipotesa 6-------
+# H0 : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki tingkat stres tinggi lebih sedikit dibanding mahasiswa tingkat awal (SEM 1-4)
+# Ha : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki tingkat stres tinggi lebih banyak dibanding mahasiswa tingkat awal (SEM 1-4)
+  
+# Tabel frekuensi
+tabel_frek6 <- hipotesa6
+tabel_frek6
+
+# Tabel proporsi
+tabel_prop6 <- tabel_frek6/NROW(B1)
+tabel_prop6
+
+# Uji Hipotesa 
+(chi_test6 <- chisq.test(tabel_frek6))
+
+# Critical Value
+(cvalue6 <- qchisq(0.05, df = 3, lower.tail = FALSE))
+
+# HASIL :
+# p-value (0,3458) > alpha (5%) dan t-test/x-squared (3,313) < critical value (7,814728)
+# artinya, H0 tidak dapat ditolak pada tingkat signifikansi 5% dan terima H0
+
+Mahasiswa <- c("MABA", "MALA")
+
+#Pada data: proporsi tingkat stres rendah = proporsi tingkat stres "Tidak Stres" + "Stres Ringan", yakni
+StresRendah <- c((0.093137255+0.436274510),(0.004901961+0.024509804))
+
+#Pada data: proporsi tingkat stres tinggi = proporsi tingkat stres "Stres Sedang" + "Stres Berat", yakni :
+StresTinggi <- c((0.303921569+0.102941176),(0.034313725+0.000000000))
+
+ProporsiH6 <- data.frame(Mahasiswa, StresRendah, StresTinggi)
+ProporsiH6
+
+# Stres Tinggi MALA (0.03431373) < Stres Tinggi MABA (0.40686274)
+# KESIMPULAN HIPOTESA 6 : Proporsi mahasiswa tingkat akhir (SEM 5-8) yang memiliki tingkat stres tinggi lebih sedikit dibanding mahasiswa tingkat awal (SEM 1-4)
+
+```
+
